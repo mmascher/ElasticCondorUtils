@@ -7,6 +7,17 @@ import optparse
 import htcondor
 import ConfigParser
 
+def get_config(config):
+    if config:
+        if not os.path.exists(config):
+            print >> sys.stderr, "Config file %s does not exist." % config
+            sys.exit(1)
+        with open(config) as fd:
+            return json.load(fd)
+    elif os.path.exists("config.json"):
+        with open("config.json") as fd:
+            return json.load(fd)
+
 def parse_args():
     """Parse additional arguments"""
     parser = optparse.OptionParser()
@@ -16,15 +27,6 @@ def parse_args():
         parser.print_help()
         print >> sys.stderr, "%s takes no arguments." % sys.args[0]
         sys.exit(1)
-
-    cp = ConfigParser.ConfigParser()
-    if opts.config:
-        if not os.path.exists(opts.config):
-            print >> sys.stderr, "Config file %s does not exist." % opts.config
-            sys.exit(1)
-        cp.read(opts.config)
-    elif os.path.exists("config.conf"):
-        cp.read("config.conf")
 
     return opts, args
 

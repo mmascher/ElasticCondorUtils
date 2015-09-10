@@ -1,33 +1,27 @@
-import re
-import os
-import sys
-import json
 import time
-import pprint
 import htcondor
-import threading
-from threading import Thread
 from Plugins.AwsEC2 import AwsEC2
-from Functions.Additional import parse_args, get_logger, getIdleJobs
+from Functions.Additional import parse_args, getIdleJobs, get_config
     
 def main():
     #Prepared to pass arguments file with defined parameters
     opts, args = parse_args()
+    config = get_config(opts.config)
+    
     coll = htcondor.Collector()
     autoType = 't1.micro'
     
     #Key name must be always unique. Adding timestamp
-    keyPairName = 'keyNameJustas' + str(int(time.time()))
-    aws = AwsEC2({'keyName': keyPairName})
+    aws = AwsEC2(**config)
     aws.checkStatus()
     aws.createInstance("ami-7fc59d4f", 1, "t1.micro", True)
     while True:
-	IdleJobInfo = {}
+        IdleJobInfo = {}
         print 'Querying collector and getting schedulers...'
-	schedd_ads = coll.query(htcondor.AdTypes.Schedd, '', ['Name', 'MyAddress', 'ScheddIpAddr'])
-	for ad in schedd_ads:
+        schedd_ads = coll.query(htcondor.AdTypes.Schedd, '', ['Name', 'MyAddress', 'ScheddIpAddr'])
+        for ad in schedd_ads:
             print 'Querying schedds and getting idle jobs'
-	    IdleJobInfo = getIdleJobs(ad, IdleJobInfo, autoType)
+            IdleJobInfo = getIdleJobs(ad, IdleJobInfo, autoType)
         print 'Queries done. If i have idle jobs, will proceed requesting VM`s'
         for group in IdleJobInfo.keys():
             for vmtype in IdleJobInfo[group].keys():
@@ -42,4 +36,4 @@ def main():
         time.sleep(5)
 
 if __name__ == '__main__':
-	main()
+    main()
