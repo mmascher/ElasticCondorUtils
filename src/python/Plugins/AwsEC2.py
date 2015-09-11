@@ -19,7 +19,7 @@ class AwsEC2(object):
 
         return True
 
-    def createInstance(
+    def create_instance(
         self,
         instImage,
         instCount=1,
@@ -37,7 +37,7 @@ class AwsEC2(object):
 
         self.conn.run_instances(instImage, instCount, instType)
 
-    def checkStatus(self):
+    def check_status(self):
         """Check created instances.
            TODO: Need to define what to do when.
         """

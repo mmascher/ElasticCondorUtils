@@ -39,7 +39,7 @@ def get_logger():
     return True
 
 
-def getIdleJobs(ad, IdleJobInfo, autoType):
+def get_idle_jobs(ad, idle_job_info, auto_type):
     schedd = htcondor.Schedd(ad)
     try:
         jobs = schedd.xquery('JobStatus=?=1', ['RequestMemory',
@@ -50,18 +50,18 @@ def getIdleJobs(ad, IdleJobInfo, autoType):
         print e
         return
     for job in jobs:
-        autoCloudGroup = 'None'
-        autoCloudType = autoType
+        auto_cloud_group = 'None'
+        auto_cloud_type = auto_type
         if 'AutoCloudType' in job.keys():
-            autoCloudType = job['AutoCloudType']
+            auto_cloud_type = job['AutoCloudType']
         if 'AutoCloudGroup' in job.keys():
-            autoCloudGroup = job['AutoCloudGroup']
+            auto_cloud_group = job['AutoCloudGroup']
 
     # Double checking that it does not exists and add what is needed
 
-        if autoCloudGroup not in IdleJobInfo.keys():
-            IdleJobInfo[autoCloudGroup] = {}
-        if autoCloudType not in IdleJobInfo[autoCloudGroup].keys():
-            IdleJobInfo[autoCloudGroup][autoCloudType] = 0
-        IdleJobInfo[autoCloudGroup][autoCloudType] += 1
-    return IdleJobInfo
+        if auto_cloud_group not in idle_job_info.keys():
+            idle_job_info[auto_cloud_group] = {}
+        if auto_cloud_type not in idle_job_info[auto_cloud_group].keys():
+            idle_job_info[auto_cloud_group][auto_cloud_type] = 0
+        idle_job_info[auto_cloud_group][auto_cloud_type] += 1
+    return idle_job_info
